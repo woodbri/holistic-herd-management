@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+<title>Holistic Grazing</title>
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+<link rel='stylesheet' href='fullcalendar-2.3.1/fullcalendar.css' />
+<link rel='stylesheet' href='fullcalendar-2.3.1/fullcalendar.print.css' media='print' />
+<link rel='stylesheet' href='//cdn.datatables.net/1.10.4/css/jquery.dataTables.min.css' />
+<link rel='stylesheet' href='dataTables.tableTools.css' />
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+
+<script src="jquery-1.11.1.js" type="text/javascript"></script>
+<script src="jquery-ui.js" type="text/javascript"></script>
+<script src='fullcalendar-2.3.1/lib/moment.min.js' type="text/javascript"></script>
+<script src='fullcalendar-2.3.1/fullcalendar.min.js' type="text/javascript"></script>
+<script1 src='fullcalendar-2.3.1/fullcalendar.js' type="text/javascript"></script>
+<script1 src='//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js' type="text/javascript"></script>
+<script src='//cdn.datatables.net/1.10.4/js/jquery.dataTables.js' type="text/javascript"></script>
+<script src='dataTables.tableTools.min.js' type="text/javascript"></script>
+
+
+<script src='jquery.tablednd.js' type="text/javascript"></script>
+
+<script src='holistic-calendar.js' type="text/javascript"></script>
+<script src='holistic-animal-herd.js' type="text/javascript"></script>
+<script src='holistic-paddock.js' type="text/javascript"></script>
+<script src='holistic-plan.js' type="text/javascript"></script>
+<script src='holistic-rotation.js' type="text/javascript"></script>
+<script src='holistic-monitor.js' type="text/javascript"></script>
+
+<style type="text/css">
+    html, body { height: 100%; margin: 0; padding: 0;}
+    #map-canvas {
+        width: 750px;
+        height: 600px;
+    }
+    body {
+        font-family: "Trebuchet MS", "Helvetica", "Arial",  "Verdana", "sans-serif";
+        font-size: 62.5%;
+    }
+    th {
+        white-space: nowrap;
+    }
+    .check-help {
+        float: right;
+        top: 0.2em;
+        right: 0.2em;
+    }
+    .ui-tabs.ui-tabs-vertical {
+        padding: 0;
+        width: 99.8%;
+    }
+    .ui-tabs.ui-tabs-vertical .ui-widget-header {
+        border: none;
+    }
+    .ui-tabs.ui-tabs-vertical .ui-tabs-nav {
+        float: left;
+        width: 20%;
+        background: #CCC;
+        border-radius: 4px 0 0 4px;
+        border-right: 1px solid gray;
+    }
+    .ui-tabs.ui-tabs-vertical .ui-tabs-nav li {
+        clear: left;
+        width: 100%;
+        margin: 0.2em 0;
+        border: 1px solid gray;
+        border-width: 1px 0 1px 1px;
+        border-radius: 4px 0 0 4px;
+        overflow: hidden;
+        position: relative;
+        right: 0px;
+        z-index: 2;
+    }
+    .ui-tabs.ui-tabs-vertical .ui-tabs-nav li a {
+        display: block;
+        width: 100%;
+        padding: 0.6em 1em;
+    }
+    .ui-tabs.ui-tabs-vertical .ui-tabs-nav li a:hover {
+        cursor: pointer;
+    }
+    .ui-tabs.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active {
+        margin-bottom: 0.2em;
+        padding-bottom: 0;
+        border-right: 2px solid white;
+    }
+    .ui-tabs.ui-tabs-vertical .ui-tabs-nav li:last-child {
+        margin-bottom: 10px;
+    }
+    .ui-tabs.ui-tabs-vertical .ui-tabs-panel {
+        float: left;
+        width: 76%;
+        min-height: 100%;
+        border-radius: 0;
+        position: relative;
+        left: 0px;
+    }
+    #planning-two-col {
+        display: block;
+        overflow: auto;
+    }
+    #calendar {
+        max-width: 900px;
+        width: auto;
+        margin: 0 auto;
+        margin-top: 2em;
+        padding: 1em;
+        float: left;
+    }
+    #calendar-filter {
+        float: left;
+        margin-top: 2em;
+        margin-left: 2em;
+    }
+    #herd-dialog div,
+    #animal-dialog div,
+    #paddock-dialog div,
+    #paddock-event-dialog div,
+    #event-dialog div {
+        margin: 5px;
+    }
+    div.hg-dialog div {
+        margin: 5px;
+    }
+    #event-dialog div.notice p {
+        color: red;
+    }
+    .tab-unknown,
+    .evt-unknown,
+    .fc-agenda .evt-unknown .fc-event-time,
+    .evt-unknown a {
+        background-color: '#3A87A0';
+        border-color: '#3A87A0';
+        color: white !important;
+    }
+    .tab-social,
+    .evt-social,
+    .fc-agenda .evt-social .fc-event-time,
+    .evt-social a {
+        background-color: purple;
+        border-color: purple;
+        color: white !important;
+    }
+    .tab-livestock,
+    .evt-livestock,
+    .fc-agenda .evt-livestock .fc-event-time,
+    .evt-livestock a {
+        background-color: OrangeRed;
+        border-color: OrangeRed;
+        color: white !important;
+    }
+    .tab-paddock,
+    .evt-paddock,
+    .fc-agenda .evt-paddock .fc-event-time,
+    .evt-paddock a {
+        background-color: green;
+        border-color: green;
+        color: white !important;
+    }
+    .tab-monitor,
+    .evt-monitor,
+    .fc-agenda .evt-monitor .fc-event-time,
+    .evt-monitor a {
+        background-color: yellow;
+        border-color: yellow;
+        color: black !important;
+    }
+    .tab-planning,
+    .evt-planning,
+    .fc-agenda .evt-planning .fc-event-time,
+    .evt-planning a {
+        background-color: orange;
+        border-color: orange;
+        color: black !important;
+    }
+    .tab-exclusion,
+    .evt-exclusion,
+    .fc-agenda .evt-exclusion .fc-event-time,
+    .evt-exclusion a {
+        background-color: red;
+        border-color: red;
+        color: white !important;
+    }
+    .tab-rotation,
+    .evt-rotation,
+    .fc-agenda .evt-rotation .fc-event-time,
+    .evt-rotation a {
+        background-color: crimson;
+        border-color: crimson;
+        color: white !important;
+    }
+    td.paddock-dec {
+        background: url('details_close.png') no-repeat center center;
+        cursor: pointer;
+        z-index: 1000;
+    }
+    td.paddock-inc,
+    td.paddock-event-opener,
+    td.animal-opener {
+        background: url('details_open.png') no-repeat center center;
+        cursor: pointer;
+        z-index: 1000;
+    }
+    td.noDragHandle,
+    td.dragHandle {
+        padding: 4px;
+        width: 10px;
+    }
+    td.showDragHandle {
+        background-image: url(updown2.gif);
+        background-repeat: no-repeat;
+        background-position: center center;
+        cursor: move;
+    }
+    tr.conflict {
+        background-color: red;
+    }
+    #plan-rotations,
+    #plan-rotations thead th ,
+    #plan-rotations tbody td {
+        border: 1px solid silver;
+        padding-right: 4px;
+        padding-left: 4px;
+    }
+    .fc-day-grid-event > .fc-content { /* force events to be one-line tall */
+        white-space: normal;
+        overflow: visible;
+    }
+
+    .fc-title {
+        white-space: wrap !important;
+    }
+    #monitor-overview td {
+        font-size: 0.8em;
+    }
+    @media print {
+        .ui-tabs-nav { display: none; }
+        //.ui-tabs .ui-tabs-hide { display: block !important; }
+        //.ui-tabs .ui-tabs-panel { display: block !important; }
+        .ui-tabs-panel { width: 100%; }
+        .no-print { display: none; }
+        #step9 { float: none !important; }
+        thead { display: table-header-group; }
+    }
+</style>
+
+<script type="text/javascript">
+    function number_format(number, decimals, dec_point, thousands_sep) {
+        // http://kevin.vanzonneveld.net
+        var n = !isFinite(+number) ? 0 : +number, 
+            prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+            sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+            dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+            toFixedFix = function (n, prec) {
+                // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+                var k = Math.pow(10, prec);
+                return Math.round(n * k) / k;
+            },
+            s = (prec ? toFixedFix(n, prec) : 
+                    Math.round(n)).toString().split('.');
+        if (s[0].length > 3) {
+            s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+        }
+        if ((s[1] || '').length < prec) {
+            s[1] = s[1] || '';
+            s[1] += new Array(prec - s[1].length + 1).join('0');
+        }
+        return s.join(dec);
+    }
+
+    var planId = null;      ///< active plan ID
+    var planData = null;    ///< active plan data     
+    var pickerOld = null;   ///< old date picker value to compute delta times
+    var herdId = null;      ///< active herd ID
+    var herdName = null;    ///< active herd name
+    var herdCnt = 0;        ///< number of herds in the active plan
+    var paddockId = null;   ///< active paddock ID
+    var paddockName = null; ///< active paddock name
+    var paddockSelect = true;   ///< toggle select|unselect of paddocks
+    var peakSau = 0;        ///< peak monthly SAU in plan
+    var totalCellSize = 0;  ///< total acres or hectacres in plan
+    var mapcenter = null;
+    var infoWindow = new google.maps.InfoWindow();;
+    var rotationPlan = null;
+    var calSelected = /./;
+
+    function intVal( i ) {
+        var val = typeof i === 'string' ?  i*1 :
+            typeof i === 'number' ? i : 0;
+        return val;
+    }
+
+    function helpInit() {
+        $(".help-dialog").dialog({
+            autoOpen: false,
+            width: 500,
+            modal: true,
+            closeOnEscape: true,
+            buttons: {
+                "Close": function() {
+                    $(this).dialog('close');
+                }
+            }
+
+        });
+    }
+        
+    function showHelp(id) {
+        $("#help-"+id).dialog('open');
+    }
+
+
+
+    function updateBugs(list) {
+        var data;
+        if (list)
+            data = 'mode=bugs&text=';
+        else
+            data = 'mode=bugs&text='+$("#bugs").val();
+
+        $.ajax({
+            url: 'holistic-plan.php',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function(json) {
+                if (json.error) {
+                    alert('Error server reported: '+json.error);
+                    return;
+                }
+                $("#bugs").val(json.bugs);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                updateStepsCompleted(planData.steps);
+                alert( "ERROR:\n" + textStatus + "\n" + errorThrown);
+            }
+        });
+    }
+
+
+    function initializeMap() {
+        mapcenter = new google.maps.LatLng(36.7159740436555, -121.317073897135);
+
+        var mapOptions = {
+            zoom: 14,
+            mapTypeId: google.maps.MapTypeId.SATELLITE,
+            center: mapcenter
+        };
+
+        google.maps.visualRefresh = true;
+
+        var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+        var tm = new Date();
+
+        var paddocks = new google.maps.KmlLayer({
+            url: window.location.href + "/holistic-paddock-kml.php?plan="+(planId===null?-1:planId)+"&_="+tm.getTime(),
+            suppressInfoWindows: true,
+            map: map
+        });
+
+        google.maps.event.addListener(paddocks, 'click', function(kmlEvent) {
+            var text = "<div>" + kmlEvent.featureData.name.replace(/ /g, '&nbsp;') + "</div>";
+            infoWindow.close();
+            infoWindow.setOptions({
+                content: text, 
+                position: kmlEvent.latLng
+            });
+            infoWindow.open(map);
+        });
+
+        return map;
+    }
+
+    function reInitTableTools() {
+        var ttInstances = TableTools.fnGetMasters();
+        for (var i in ttInstances) {
+            if (ttInstances[i].fnResizeRequired())
+                ttInstances[i].fnResizeButtons();
+        }
+    }
+        
+
+//-------------------------------------------------------------------
+
+//-------------------------------------------------------------------
+
+    $(document).ready(function () {
+
+        var map = null;
+
+        $("#tabs").tabs({
+            activate: function(event, ui) {
+                // if this is the calendar tab then refetch and redisplay
+                // events that might have gotten changed on another tab
+                if (ui.newPanel.selector == '#tabs-calendar') {
+                    if ($('#calendar').fullCalendar('getView').intervalStart
+                            === null) 
+                        $('#calendar').fullCalendar('today');
+                    else
+                        $('#calendar').fullCalendar('refetchEvents');
+                }
+                else if (ui.newPanel.selector == '#tabs-paddock') {
+                    reloadPaddockTab();
+                }
+                else if (ui.newPanel.selector == '#tabs-reports') {
+                    map = initializeMap();
+                    google.maps.event.trigger(map, 'resize');
+                    map.setCenter(mapcenter);
+                }
+                else if (ui.newPanel.selector == '#tabs-help') {
+                    updateBugs(true);
+                }
+                else if (ui.newPanel.selector == '#tabs-planning') {
+                    var activeTab = $("#planning-tabs").tabs("option", "active");
+                    $("#planning-tabs").tabs("option", "active", 0);
+                    $("#planning-tabs").tabs("option", "active", activeTab);
+                }
+            }
+        });
+        $("#tabs").tabs("option", "active", 0);
+
+        $("#planning-tabs").tabs({
+            beforeActivate: function(event, ui) {
+                if (ui.newPanel.selector != '#started' &&
+                        planId === '' || planId === null) {
+                    alert("Create or Select a plan first!");
+                    event.preventDefault();
+                }
+            },
+            activate: function(event, ui) {
+                switch (ui.newPanel.selector) {
+                    case '#step1':
+                        $("#step1-factors").val(planData.factors);
+                        break;
+                    case '#step3':
+                        reloadPaddockList();
+                        $("#exclusion-table").DataTable().ajax.reload(reInitTableTools);
+                        reloadPaddockAvailable();
+                        break;
+                    case '#step4':
+                        reloadLivestockTab();
+                        break;
+                    case '#step6':
+                        $("#paddock-productivity").DataTable()
+                            .ajax
+                            .url("holistic-paddock.php?mode=pplist&plan="+planId)
+                            .load(reInitTableTools);
+                        break;
+                    case '#step7':
+                        $("#recovery-by-month").DataTable()
+                            .ajax
+                            .url("holistic-paddock.php?mode=prlist&plan="+planId)
+                            .load(reInitTableTools);
+                        break;
+                    case '#step8':
+                        $("#actual-min-max-grazing").DataTable()
+                            .ajax
+                            .url("holistic-paddock.php?mode=listgraz&plan="+planId)
+                            .load(reInitTableTools);
+                        break;
+                    case '#step9':
+                        // TODO : set the default grazing days from the plan
+                        var defgd = intVal(planData.defgd)==1?1:2;
+                        $("#plot-default-gd").val(defgd);
+                        loadRotationTable("plan-rotations");
+                        break;
+                    case '#step10':
+                        $('#monitor-overview').DataTable()
+                            .ajax
+                            .url("holistic-monitor.php?mode=olist&plan="+planId)
+                            .load(reInitTableTools);
+
+                        $('#monitor-details').DataTable()
+                            .ajax
+                            .url("holistic-monitor.php?mode=dlist&days=90")
+                            .load(reInitTableTools);
+                        break;
+                }
+            }
+        })
+        .addClass('ui-tabs-vertical ui-helper-clearfix');
+
+        $(".date-picker").datepicker({
+            dateFormat: "yy-mm-dd",
+            appendText: "(yyyy-mm-dd)",
+            changeYear: true
+        });
+
+        helpInit();
+
+        holisticCalendarInit();
+        paddockInit();
+        animalHerdInit();
+        planningInit();
+        rotationInit();
+        monitorInit();
+
+        selectPlan(0);
+
+        updateBugs(true);
+
+    });     // document.ready()
+
+</script>
+</head>
+<body>
+
+<div id="tabs">
+
+    <ul>
+    <li><a href="#tabs-planning">Planning</a></li>
+    <li><a href="#tabs-calendar">Calendar</a></li>
+    <li><a href="#tabs-paddock">Paddocks</a></li>
+    <li><a href="#tabs-reports">Map</a></li>
+    <li><a href="#tabs-help">Help</a></li>
+    </ul>
+
+<div id="tabs-paddock">
+    <h1>Land Management</h1>
+    <div>
+        <h2>Paddocks</h2>
+        <ul>
+            <li>Add Paddocks.</li>
+            <li>Click on a paddock row to edit the paddock record.</li>
+        </ul>
+        <div>
+            <button onclick="addPaddock()">Add Paddock</button>
+        </div>
+
+        <table id="paddock-table" class="display" width="100%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Area</th>
+                    <th>Area Type</th>
+                    <th>Crop</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div id="tabs-calendar">
+    <div>
+        <h1>Calendar <span id="span-cal-title"></span></h1>
+        <p class="no-print">You can add Management events here by clicking or click drag to create a multi-day event. Click on events to see more details and/or to edit Management events. You can also drag Management events to a new location or drag the end of the event to shorten or lengthen it. Non-Management events can only be changed on the page where they were created. Click on the event and read the Notice for more information. You can also toggle the visibility of events in checking then on/off in the Filter Events control.</p>
+    </div>
+    <div>
+        <div id="calendar"></div>
+        <div id="calendar-filter">
+            <h2>Filter Events</h2>
+            <table>
+                <tr><td><input value="all" type="checkbox" onclick="checkFilters($(this))">&nbsp;All Events</td></tr>
+                <tr><td class="tab-social cal-select"><input value="social" type="checkbox" onclick="checkFilters($(this))">&nbsp;Mangement</td></tr>
+                <tr><td class="tab-planning cal-select"><input value="planning" type="checkbox" onclick="checkFilters($(this))">&nbsp;Planning</td></tr>
+                <tr><td class="tab-livestock cal-select"><input value="livestock" type="checkbox" onclick="checkFilters($(this))">&nbsp;Livestock</td></tr>
+                <tr><td class="tab-paddock cal-select"><input value="paddock" type="checkbox" onclick="checkFilters($(this))">&nbsp;Paddock</td></tr>
+                <tr><td class="tab-exclusion cal-select"><input value="exclusion" type="checkbox" onclick="checkFilters($(this))">&nbsp;Exclusion</td></tr>
+                <tr><td class="tab-rotation cal-select"><input value="rotation" type="checkbox" onclick="checkFilters($(this))">&nbsp;Rotation</td></tr>
+                <tr><td class="tab-monitor cal-select"><input value="monitor" type="checkbox" onclick="checkFilters($(this))">&nbsp;Monitor</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="tabs-planning">
+    <h1>Planning</h1>
+    <div class="no-print">Select:&nbsp;<select id="select-plan" onchange="selectPlan(-1)">
+        <option value="">Select or Create a Plan</option>
+        </select>&nbsp;&nbsp;<button onclick="createPlan()">New Plan</button>&nbsp;&nbsp;<button onclick="editPlan()">Edit Plan</button>
+    </div>
+    <h2><span id="span-plan-name">Name</span> for year: <span id="span-plan-year">YYYY</span> - <span id="span-plan-ptype">Open|Closed</span> - Dates: <span id="span-plan-start">YYYY-MM-DD</span> - <span id="span-plan-end">YYYY-MM-DD</span></h2>
+    <div id="planning-two-col">
+        <h3>Planning Steps</h3>
+        <div id="planning-tabs">
+            <ul>
+                <li><a href="#started">Getting Started</a></li>
+                <li><a href="#step1"><input type="checkbox" id="cstep1" onclick="clickStepCompleted(event, 1)"> Identify Planning Factors</a></li>
+                <li><a href="#step2"><input type="checkbox" id="cstep2" onclick="clickStepCompleted(event, 2)"> Management Concerns</a></li>
+                <li><a href="#step3"><input type="checkbox" id="cstep3" onclick="clickStepCompleted(event, 3)"> Select Paddocks and Exclusions</a></li>
+                <li><a href="#step4"><input type="checkbox" id="cstep4" onclick="clickStepCompleted(event, 4)"> Define the Herd(s)</a></li>
+                <li><a href="#step5"><input type="checkbox" id="cstep5" onclick="clickStepCompleted(event, 5)"> Check Historical Grazing Patterns</a></li>
+                <li><a href="#step6"><input type="checkbox" id="cstep6" onclick="clickStepCompleted(event, 6)"> Rate Paddock Productivity</a></li>
+                <li><a href="#step7"><input type="checkbox" id="cstep7" onclick="clickStepCompleted(event, 7)"> Determine Recovery Periods</a></li>
+                <li><a href="#step8"><input type="checkbox" id="cstep8" onclick="clickStepCompleted(event, 8)"> Check Grazing Periods</a></li>
+                <li><a href="#step9"><input type="checkbox" id="cstep9" onclick="clickStepCompleted(event, 9)"> Plot Grazings on Calendar</a></li>
+                <li><a href="#step10"><input type="checkbox" id="cstep10" onclick="clickStepCompleted(event, 10)"> Implement the Plan</a></li>
+            </ul>
+            <div id="started">
+                <h3>Getting Started</h3>
+    <p>Welcome to the Holistic Planning Application.</p>
+                <h3>For the First Time</h3>
+    <p>To get started, you need to define your ranch's paddocks. This is done on the "Paddocks" tab. This needs to be done once initially and anytime you decide to change the layout of paddocks on the ranch.</p>
+                <h3>Making a New Plan</h3>
+    <p>If you have already defined your Paddocks for the ranch, then you need to create a Plan, use the [New Plan] button above, or select an existing plan from the drop down menu. When you start the application it will automatically select the last plan created.</p>
+    <p>Now that you have a plan to work with, you can follow the planning process by using the tabs on the left of the "Planning" tab. The process follows the order of the tabs from top to bottom. You can revisit any tab as needed to review or change your inputs. Click the "Completed" checkbox to indicate that you have competed that tab. This is just a simple bookkeeping feature so you can easily remember what still needs to be worked out. You can still go back to a "completed" tab as needed and make changes or toggle the checkbox on/off.</p>
+    <p>The "Calendar" tab above will be an essential part of the planning application. Most elements of your plan will have dates associated with them and anything with a related date or date range will get rendered in the Calendar. This provides you with critical information like whether events conflict time-wise and may need to be moved around or other actions may need to be planned to accomdate the conflicts.<p>
+    <p>Next Steps: Simple go to the next tab "Identify Planning Factors" and work your way down the planning list. Each tab has a context specific [Help] button to discuss issues and concerns related to that planning step.</p>
+            </div>
+            <div id="step1">
+                <div class="check-help">
+                    <button onclick="showHelp('step1')">Help</button>
+                </div>
+                <h3>Identify Planning Factors</h3>
+                <p>Gather the team of people that implemented last years plan and that will be responsible for this year's plan. Consider your goals and the goals for the landscape your wish to create. Make a list of factors that will touch on livestock, wildlife, crops, haying, etc. Think through how the entire ranch will be used concidering the number of cells, herds, stocking rates, cropping, drought reserve and biological monitoring.</p>
+                <p>Enter or edit your factors in this list:<br/>
+                <textarea id="step1-factors" cols="50" rows="20"></textarea><br/>
+                <button onclick="saveFactors('step1-factors')">Save Changes</button>
+                </p>
+            </div>
+            <div id="step2">
+                <div class="check-help">
+                    <button onclick="showHelp('step2')">Help</button>
+                </div>
+                <h3>Management Concerns</h3>
+                <p>In this section, think about various factors that influence your calendar for the plan. Consider:
+                    <ul>
+                        <li>Livestock events like birthing, breeding, weaning, etc and when these are planned.</li>
+                        <li>Management events such as vacations, family or community events that need to be planned around.</li>
+                        <li>Other specific events like hunting seasons that might influence the sequence of paddock moves.</li>
+                    </ul>
+                </p>
+                <p>Enter these events into the Calendar on the "Calendar" tab. You will come back to this later when you are planning your moves and it will be helpful to be able to see these events while planning moves.</p>
+                <ul>
+                    <li>Go to the <a href="#" onclick='$("#tabs").tabs("option", "active", 1)'>Calendar</a> tab and enter these events.</li>
+                    <li>Go to the  <a href="#" onclick='$("#planning-tabs").tabs("option", "active", 1)'>Identify Planning Factors</a> tab and add more factors that you want to remember.</li>
+                </ul>
+            </div>
+            <div id="step3">
+                <div class="check-help">
+                    <button onclick="showHelp('step3')">Help</button>
+                </div>
+                <h3>Select Paddocks</h3>
+                <p>Select the paddocks to use for this plan. Click the <img src="details_open.png"> to add the paddock. You may add the paddock more than once if you plan to graze it multiple times during the plan. (Note: The current version only supports grazing a paddock once.) Click the <img src="details_close.png"> to reduce the usage count or remove it from the plan. You may also use the [Select/Unselect All] button under the table. When you are ready, click the [Save in Plan] button.</p>
+                <div>
+                    <table id="paddock-list" class="display cell-border" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th>Use Count</th>
+                                <th>Name</th>
+                                <th>Area</th>
+                                <th>Plan Name</th>
+                                <th>Plan Id</th>
+                                <th>Pad. Id</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <button onclick="selectAllPaddocks()">Select|Unselect ALL</button>
+                    <button onclick="setPaddocksForPlan()">Save in Plan</button>
+                </div>
+                <br/>
+                <br/>
+                <h3>Paddock Livestock Exclusions and Special Attention</h3>
+                <p>Enter dates when a paddock can not under any circomstanceces have a herd on it and select type "Livestock". Also enter dates for paddocks that need special attention and select type "Special". Such paddocks could include a sacrificial paddock where you plan to run some animals on continuous graze, bare, eroding ground that needs healing, areas you want to rest for brush cover for wildlife, areas where you need to remove forage for fire protection, paddocks you plan to strip graze. Review the list of planning factors.</p>
+                <div>
+                    <div>
+                        <button onclick="addExclusion()">Add Paddock Exclusion</button>
+                    </div>
+
+                    <table id="exclusion-table" class="display cell-border" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Paddock</th>
+                                <th>Exc. Type</th>
+                                <th>Exc. Start</th>
+                                <th>Exc. End</th>
+                                <th>Reason</th>
+                                <th class="hidden">PlanID</th>
+                                <th class="hidden">ID</th>
+                                <th class="hidden">PadID</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <br/>
+                <br/>
+                <h3>Paddock Availability</h3>
+                <p>This table displays the number of days each paddock is available during the plan based on selected paddocks and paddock exclusions. The table footer shows the number of paddocks available each month where a paddock is considered available if it is available for 15 or more days during that month.</p>
+                <div>
+
+                     <table id="paddock-available" class="display cell-border" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Paddock</th>
+                                <th>Jan</th>
+                                <th>Feb</th>
+                                <th>Mar</th>
+                                <th>Apr</th>
+                                <th>May</th>
+                                <th>Jun</th>
+                                <th>Jul</th>
+                                <th>Aug</th>
+                                <th>Sep</th>
+                                <th>Oct</th>
+                                <th>Nov</th>
+                                <th>Dec</th>
+                            </tr>
+                        </thead>
+
+                        <tfoot>
+                            <tr>
+                                <th>Count of Pad.<br/>Avail. by Month</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                     </table>
+                </div>
+            </div>
+            <div id="step4">
+                <div class="check-help">
+                    <button onclick="showHelp('step4')">Help</button>
+                </div>
+                <h3>Define the Herd(s)</h3>
+                <div>
+                    <h3>Herds</h3>
+                    <ul>
+                        <li>Add herd(s). (see Help.)</li>
+                        <li>Click on a herd row to edit the herd record.</li>
+                        <li>Click on a herd <img src="details_open.png"> to view/add/edit animals in the herd.</li>
+                    </ul>
+                    <div>
+                        <button onclick="addHerd()">Add Herd</button>
+                    </div>
+
+                    <table id="herd-table" class="display cell-border" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>SAU</th>
+                                <th>Daily Intake</th>
+                                <th>Earliest Arrival</th>
+                                <th>Latest Depature</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <br/>
+                <hr/>
+                <br>
+                <div>
+                    <h3>Animals for <span id="herd-name-span"><i>herd-name</i></span></h3>
+                    <ul>
+                        <li>Add Animals</li>
+                        <li>Click a row to edit the animal.</li>
+                        <li>Enter either single animals or groups by type and average weight.</li>
+                        <li>Animal weight is based on <span id="weight-per-sau">1000 lbs</span> per SAU.</li>
+                    </ul>
+                    <div>
+                        <button onclick="addAnimal()">Add Animal</button>
+                    </div>
+
+                    <table id="animal-table" class="display cell-border" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Qty</th>
+                                <th>SAU</th>
+                                <th>Weight</th>
+                                <th>Dry matter intake<br/>(% of weight)</th>
+                                <th>Tag</th>
+                                <th>Arrival</th>
+                                <th>Est. Ship Date</th>
+                                <th>Act. Ship Date</th>
+                                <th class="hidden">Notes</th>
+                                <th class="hidden">HerdID</th>
+                                <th class="hidden">ID</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                <br/>
+                <br/>
+                <h3>SAU by Month</h3>
+                <p>This table summarizes fluctuations in herd size per month in Standard Animal Units. It is read only, but you can export to excel, pdf or print by clicking on the buttons to your right.</p>
+                <div>
+
+                    <table id="monthly-sau" class="display cell-border" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Herd</th>
+                                <th>Jan</th>
+                                <th>Feb</th>
+                                <th>Mar</th>
+                                <th>Apr</th>
+                                <th>May</th>
+                                <th>Jun</th>
+                                <th>Jul</th>
+                                <th>Aug</th>
+                                <th>Sep</th>
+                                <th>Oct</th>
+                                <th>Nov</th>
+                                <th>Dec</th>
+                            </tr>
+                        </thead>
+
+                        <tfoot>
+                            <tr>
+                                <th>Total SAU</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <br/>
+                <br/>
+                <h3>Stocking Rates</h3>
+                <div>
+                    <table>
+                        <tr>
+                            <td align="right">Total Cell Size:</td>
+                            <td id="total-cell-size" align="right"></td>
+                        </tr>
+                        <tr>
+                            <td align="right">Peak Monthly SAU:</td>
+                            <td id="peak-monthly-sau" align="right"></td>
+                        </tr>
+                        <tr>
+                            <td align="right">Stocking Rate:</td>
+                            <td id="stocking-rate" align="right"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="step5">
+                <div class="check-help">
+                    <button onclick="showHelp('step5')">Help</button>
+                </div>
+                <h3>Check Historical Grazing Patterns</h3>
+                <select id="grazing-which-pad">
+                    <option value="1" selected>Paddocks in Plan</option>
+                    <option value="2">All Paddocks</option>
+                </select>&nbsp;<select id="grazing-which-yrs">
+                    <option value="1">Look 1 year back</option>
+                    <option value="3" selected>Look 3 years back</option>
+                    <option value="5">Look 5 years back</option>
+                    <option value="7">Look 7 years back</option>
+                    <option value="10">Look 10 years back</option>
+                </select>&nbsp;<button onclick="updateGrazingPatterns()">Update Table</button>
+                <table id="grazing-pattern" class="display cell-border" width="100%" cellspacing="0">
+                    <thead>
+                        <th>Paddock</th>
+                        <th>Jan</th>
+                        <th>Feb</th>
+                        <th>Mar</th>
+                        <th>Apr</th>
+                        <th>May</th>
+                        <th>Jun</th>
+                        <th>Jul</th>
+                        <th>Aug</th>
+                        <th>Sep</th>
+                        <th>Oct</th>
+                        <th>Nov</th>
+                        <th>Dec</th>
+                        <th>Total</th>
+                        <th>ID</th>
+                    </thead>
+
+                </table>
+            </div>
+            <div id="step6">
+                <div class="check-help">
+                    <button onclick="showHelp('step6')">Help</button>
+                </div>
+                <h3>Rate Paddock Productivity</h3>
+                <p>Enter a value for each paddock in the <b>Forage Quality</b> field, then click the [Save] button. See the <a href="#" onclick="showHelp('step6')">Help</a> button for more information.</p>
+                <div>
+                    <table id="paddock-productivity" class="display cell-border" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Forage Quality</th>
+                                <th>Est. Relative Quality</th>
+                                <th>Pad. Id</th>
+                                <th>Id</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <br/>
+                    <button onclick="savePaddockProductivity()">Save</button>
+                    <br/>
+                    <br/>
+                    <table>
+                        <tr>
+                            <td align="right">Average Total AD/A or Rating:</td>
+                            <td id="average-animal-days"></td>
+                        </tr>
+                        <tr>
+                            <td align="right">Average AD/A or Rating:</td>
+                            <td id="average-forage-qual"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="step7">
+                <div class="check-help">
+                    <button onclick="showHelp('step7')">Help</button>
+                </div>
+                <h3>Determine Recovery Periods</h3>
+                <div>
+                    <table id="recovery-by-month" class="display cell-border" cellspacing=0">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Min. Recovery Days</th>
+                                <th>Max. Recovery Days</th>
+                                <th>Month Id</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <br/>
+                    <button onclick="saveRecoveryPeriods()">Save</button>
+                    <br/>
+                    <br/>
+                    <h3>Estimated Min/Max Grazing Periods</h3>
+                    <table>
+                        <tr>
+                            <td align"right">Est. Min. Grazing Period:</td>
+                            <td align"right" id="est-min-grazing-period"></td>
+                        </tr>
+                        <tr>
+                            <td align"right">Est. Max. Grazing Period:</td>
+                            <td align"right" id="est-max-grazing-period"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="step8">
+                <div class="check-help">
+                    <button onclick="showHelp('step8')">Help</button>
+                </div>
+                <h3>Check Grazing Periods</h3>
+                <p>Check to see that recovery periods are adequate in paddocks with longer grazing periods. Use the <b>Check Min/Max Recovery Period</b> below and if any recovery period is much too short, you must add days to the minimum grazing periods in other paddocks that can absorb them.  Follow the same procedure for maximum grazing periods, though the problems will probably be less critical if you can't make complete adjustments.</p>
+                <h3>Actual Min/Max Grazing Periods</h3>
+                <table id="actual-min-max-grazing" class="display cell-border" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Paddock</th>
+                            <th>Area</th>
+                            <th>Quality</th>
+                            <th>Act Min Grazing Days</th>
+                            <th>Act Max Grazing Days</th>
+                            <th>Pad Id</th>
+                        </tr>
+                    </thead>
+
+                    <tfoot>
+                        <tr>
+                            <th>Sum of Paddocks</th>
+                            <th id="chk-tot-area"></th>
+                            <th id="chk-tot-ada"></th>
+                            <th id="chk-tot-min-gd"></th>
+                            <th id="chk-tot-max-gd"></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+
+                </table>
+                <br/>
+                <br/>
+                <table>
+                    <tr>
+                        <td align"right">Check Min Recovery Period:</td>
+                        <td align"right" id="chk-min-recovery"><td>
+                    </tr>
+                    <tr>
+                        <td align"right">Check Max Recovery Period:</td>
+                        <td align"right" id="chk-max-recovery"></td>
+                    </tr>
+                </table>
+            </div>
+            <div id="step9">
+                <div class="check-help no-print">
+                    <button onclick="showHelp('step9')">Help</button>
+                </div>
+                <h3>Plot Grazings on Calendar</h3>
+                <p class="no-print">Drag and drop the <img src="updown2.gif"> to reorder the paddocks in the list. Default <b>Grazing Days</b> to <select id="plot-default-gd" onchange="setDefaultGrazingDays()">
+                <option value="2" selected>Max Grazing Days</option>
+                <option value="1">Min Grazing Days</option></select>. You may click on a paddock and change the number of grazing days you want.</p>
+                <table id="plan-rotations" cellspacing="0" cellpadding="1">
+                    <thead>
+                        <tr class="nodrop nodrag">
+                            <th class="dragHandle">&nbsp;</th>
+                            <th>Paddock</th>
+                            <th>Grazing<br>Days</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th id="planning-calendar">Calendar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="step10">
+                <div class="check-help no-print">
+                    <button onclick="showHelp('step10')">Help</button>
+                </div>
+                <h2>Implement the plan</h2>
+                <p class="no-print">Review your plan, monitor the paddocks, make the moves, and replan if needed. See the <a href="showHelp('step10')">Help</a> for more information.</p>
+                <h3 class="no-print">Monitor the Paddocks</h3>
+                <p class="no-print"><button onclick="addMonitorEvent()">Add Monitor Event</button></p>
+                <h3>Monitor Status of Paddocks</h3>
+                <table id="monitor-overview" class="display cell-border" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Rot.<br>Seq</th>
+                            <th>Paddock</th>
+                            <th>Monitored</th>
+                            <th>Who</th>
+                            <th>Moisture</th>
+                            <th>Growth<br>Rate</th>
+                            <th>Monitored<br>ADA</th>
+                            <th>Planned<br>ADA</th>
+                            <th>Days Since<br>Monitored</th>
+                            <th>Days til<br>Herd In</th>
+                            <th>Days<br>Herd In</th>
+                            <th>Days til<br>Herd Out</th>
+                            <th>Days<br>Herd Out</th>
+                            <th>Pad Id</th>
+                            <th>Mon Id</th>
+                        </tr>
+                    </thead>
+                </table>
+                <h3>Detailed Monitor Events</h3>
+                <p>Limit results to last <input type="text" size="5" name="lastndays" id="lastndays" value="90"> days. <button onclick="updateMonitorDetails()">Update Table</button> Click row to edit data.</p>
+                <table id="monitor-details" class="display cell-border" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Paddock</th>
+                            <th>Date</th>
+                            <th>Moisture</th>
+                            <th>Growth Rate</th>
+                            <th>Monitored ADA</ht>
+                            <th>Recorder</th>
+                            <th>Notes</th>
+                            <th>Id</th>
+                            <th>Pad Id</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="tabs-reports">
+    <h1>Map of Ranch</h1>
+    <div id="map-canvas"></div>
+</div>
+
+<div id="tabs-help">
+    <h1>Help</h1>
+    <p>Temporary TODO and issue tracking list:</p>
+    <textarea id="bugs" rows="30" cols="80"></textarea><br/>
+    <button onclick="updateBugs()">Save</button>
+</div>
+
+</div>
+
+<div id="event-dialog" title"Edit Event" class="hg-dialog">
+    <div>
+    Title:<br/>
+    <input type="text" id="ed-title" width="60">&nbsp;required
+    </div>
+    <div>
+    <input type="checkbox" id="ed-allday">&nbsp;All Day
+    </div>
+    <div>
+    Select Event Classification:<br/>
+    <select disabled id="ed-class">
+    <option value="evt-unknown" class="evt-unknown">Select Class</option>
+    <option value="evt-social" class="evt-social">Management</option>
+    <option value="evt-livestock" class="evt-livestock">Livestock</option>
+    <option value="evt-paddock" class="evt-paddock">Land Management</option>
+    <option value="evt-monitor" class="evt-monitor">Monitor</option>
+    <option value="evt-planning" class="evt-planning">Plans</option>
+    <option value="evt-rotation" class="evt-rotation">Rotation</option>
+    </select>
+    </div>
+    <div>
+    Start Date/Time:<br/>
+    <input type="text" id="ed-start" class="ed-date-picker" width="60">
+    </div>
+    <div>
+    End Date/Time:<br/>
+    <input type="text" id="ed-end" class="ed-date-picker" width="60">
+    </div>
+    <div>
+    Description:<br/>
+    <textarea id="ed-description" cols="35" rows="10"></textarea>
+    </div>
+    <div class="notice"></div>
+    <input type="hidden" id="ed-id">
+    <input type="hidden" id="ed-refid">
+</div>
+
+<div id="herd-dialog" title="Add/Edit Herd/Flock" class="hg-dialog">
+    <div>
+    Name:<br/>
+    <input type="text" id="herd-name" width="60">&nbsp;required
+    </div>
+    <div>
+    Earliest Arrival Date:<br/>
+    <input type="text" disabled id="herd-arrival" width="60" class="date-picker">*
+    </div>
+    <div>
+    Latest Ship Date:<br/>
+    <input type="text" disabled id="herd-est-ship" width="60" class="date-picker">*
+    </div>
+    <div>
+    Number of SAU in herd:<br/>
+    <input type="text" disabled id="herd-sau" width="60">*
+    </div>
+    <div>
+    Daily intake for herd:<br/>
+    <input type="text" disabled id="herd-intake" width="60">*<br/>
+    * These fields read only. The values are based on the animals in the herd.
+    </div>
+    <input type="hidden" id="herd-id">
+</div>
+
+<div id="animal-dialog" title="Add/Edit Animal(s)" class="hg-dialog">
+    <center><b><span id="animal-herd-name"></span></b></center>
+    <div>
+    Type:<br/>
+    <select id="animal-type-select" onchange="animalTypeSelectChanged()">
+    </select><br/>
+    <input type="text" id="animal-type" width="60">&nbsp;required
+    </div>
+    <div>
+    Qty:<br/>
+    <input type="text" id="animal-qty" width="60" value="1">&nbsp;required
+    </div>
+    <div>
+    SAU (Standard Animal Unit) (based on 1 SAU == 1000 lbs):<br/>
+    <input type="text" id="animal-sau" width="60" onchange="animalSauUpdated()">
+    </div>
+    <div>
+    Weight (lbs) (exact or avg. if qty):<br/>
+    <input type="text" id="animal-weight" width="60" onchange="animalWeightUpdated()">&nbsp;required
+    </div>
+    <div>
+    Daily forage requirement as percentage of weight:<br/>
+    <input type="text" id="animal-forage" width="60">&nbsp;required
+    </div>
+    <div>
+    Tag or ID:<br/>
+    <input type="text" id="animal-tag" width="60">&nbsp;optional
+    </div>
+    <div>
+    Arrival Date:<br/>
+    <input type="text" id="animal-arrival" width="60">&nbsp;optional
+    </div>
+    <div>
+    Est. Ship Date:<br/>
+    <input type="text" id="animal-est-ship" width="60">&nbsp;optional
+    </div>
+    <div>
+    Act. Ship Date:<br/>
+    <input type="text" id="animal-act-ship" width="60">&nbsp;optional
+    </div>
+    <div>
+    Notes:<br/>
+    <textarea id="animal-notes" cols="35" rows="10"></textarea>
+    </div>
+    <input type="hidden" id="animal-id">
+    <input type="hidden" id="animal-herdid">
+</div>
+
+<div id="paddock-dialog" title="Add/Edit Paddock(s)" class="hg-dialog">
+    <div>
+    Name:<br/>
+    <input type="text" id="paddock-name" width="60">&nbsp;required
+    </div>
+    <div>
+    Area (Acres):<br/>
+    <input type="text" id="paddock-area" width="60" onchange="updatePaddockTotalAD()">&nbsp;required
+    </div>
+    <div>
+    Area Calc.:<br/>
+    <select id="paddock-atype">
+        <option value="">Select how area was calculated</option>
+        <option value="estimate">Estimated</option>
+        <option value="survey">Survey</option>
+        <option value="geometry">Geometry</option>
+    </select>
+    </div>
+    <div>
+    Crop:<br/>
+    <input type="text" id="paddock-crop" width="60">
+    </div>
+    <div>
+    Description:<br/>
+    <textarea id="paddock-description" cols="35" rows="10"></textarea>
+    </div>
+    <input type="hidden" id="paddock-id">
+</div>
+
+<div id="paddock-exc-dialog" title="Add/Edit a Paddock Exclusion" class="hg-dialog">
+    <div>
+    Select Paddock:</br>
+    <select id="exc-pad-select-list">
+        <option value="">Select Paddock</option>
+    </select>
+    </div>
+    <div>
+    Select Exclusion Type:</br>
+    <select id="exc-type">
+        <option>Livestock Exclusion</option>
+        <option>Special Attention</option>
+    </select>
+    </div>
+    <div>
+    Exclusion Start:<br/>
+    <input type="text" id="exc-start" width="60" class="date-picker">
+    </div>
+    <div>
+    Exclusion End:<br/>
+    <input type="text" id="exc-end" width="60" class="date-picker">
+    </div>
+    <div>
+    Reason for exclusion:<br/>
+    <input type="text" id="exc-reason" width="60">
+    </div>
+    <input type="hidden" id="exc-padid">
+    <input type="hidden" id="exclusion-id">
+</div>
+
+<div id="planning-dialog" title="Create/Edit a Plan" class="hg-dialog">
+    <div>
+    Plan Name:<br/>
+    <input type="text" id="active-plan-name" width="60">&nbsp;required
+    </div>
+    <div>
+    Plan Year:<br/>
+    <input type="text" id="active-plan-year" width="60">&nbsp;(YYYY) required
+    </div>
+    <div>
+    Select Plan Type:<br/>
+    <select id="active-plan-ptype">
+        <option value="0">Open-Ended Plan</option>
+        <option value="1">Closed Plan</option>
+    </select>
+    </div>
+    <div>
+    Plan Start Date:<br/>
+    <input type="text" id="active-plan-start" width="60" class="date-picker">
+    </div>
+    <div>
+    Plan End Date:<br/>
+    <input type="text" id="active-plan-end" width="60" class="date-picker">
+    </div>
+    List of Factors:<br/>
+    <textarea id="active-plan-factors" cols="35" rows="10"></textarea>
+    </div>
+    <input type="hidden" id="active-plan-id">
+</div>
+
+<div id="edit-rotation-dialog" title="Edit Grazing Days" class="hg-dialog">
+    <div>
+    Paddock:<br/>
+    <span id="edit-rot-paddock-name" style="font-weight: bold"></span>
+    </div>
+    <div>
+    Min Grazing Days:<br/>
+    <input type="text" id="edit-rot-min-gd" width="60" disabled>
+    </div>
+    <div>
+    Max Grazing Days:<br/>
+    <input type="text" id="edit-rot-max-gd" width="60" disabled>
+    </div>
+    <div>
+    Grazing Days:</br>
+    <input type="text" id="edit-rot-user-gd" width="60" onchange="editRotationGdChanged()">
+    </div>
+    <div>
+    Start Date:<br/>
+    <input type="text" id="edit-rot-start" width="60" disabled>
+    </div>
+    <div>
+    End Date:</br>
+    <input type="text" id="edit-rot-end" width="60" class="date-picker" onchange="editRotationEndChanged()">
+    </div>
+    <input type="hidden" id="edit-rot-rid">
+    <input type="hidden" id="edit-rot-o-end">
+    <input type="hidden" id="edit-rot-o-user-gd">
+</div>
+
+<div id="actual-rotation-dialog" title="Record Herd Rotation" class="hg-dialog">
+    <div>
+    Rotation:<br/>
+    <span id="rotation-title" style="font-weight: bold" onclick="$('#rotation-act-date').prop('disabled', false)"></span>
+    </div>
+    <div>
+    Planned Rotation Date:<br/>
+    <span id="rotation-plan-date" style="font-weight: bold"></span>
+    </div>
+    <div>
+    Actual Rotation Date:<br/>
+    <input type="text" id="rotation-act-date" width="60" class="date-picker">
+    </div>
+    <div>
+    Select Amount of Forage Taken:<br/>
+    <select id="rotation-forage-taken">
+        <option value="H">Heavy</option>
+        <option value="M" selected>Medium</option>
+        <option value="L">Light</option>
+    </select>
+    </div>
+    <div>
+    Select Opinion of Paddock Growth Rate:<br/>
+    <select id="rotation-growth-rate">
+        <option value='F'>Fast</option>
+        <option value='S' selected>Slow</option>
+        <option value='N'>None</option>
+    </select>
+    </div>
+    <div>
+    Check if any serious error occured<br/>
+    <input type="checkbox" id="rotation-error">
+    </div>
+    <div>
+    Livestock and Paddock Performace<br/>
+    <textarea id="rotation-comments" cols="35" rows="10"></textarea>
+    </div>
+    <input type="hidden" id="rotation-planid">
+    <input type="hidden" id="rotation-rid">
+    <input type="hidden" id="rotation-rid2">
+</div>
+
+<div id="monitor-dialog" title="Record Monitor Event" class="hg-dialog">
+    <div>
+    Select Paddock:</br>
+    <select id="monitor-pad-select-list">
+        <option value="">Select Paddock</option>
+    </select>
+    </div>
+    <div>
+    Monitor Date:<br/>
+    <input type="text" id="monitor-date" width="60" class="date-picker">
+    </div>
+    <div>
+    Select Amount of Soil Moisture:<br/>
+    <select id="monitor-moisture">
+        <option value='-1' selected>Select Soil Moisture</option>
+        <option value="1">Dusty</option>
+        <option value="2">Dry</option>
+        <option value="3">Moist</option>
+        <option value="4">Wet</option>
+        <option value="5">Soggy</option>
+    </select>
+    </div>
+    <div>
+    Select Opinion of Paddock Growth Rate:<br/>
+    <select id="monitor-growth">
+        <option value='-1' selected>Select Growth Rate</option>
+        <option value='3'>Fast</option>
+        <option value='2'>Medium</option>
+        <option value='1'>Slow</option>
+        <option value='0'>None</option>
+    </select>
+    </div>
+    <div>
+    Estimated ADA:<br/>
+    <input type="text" id="monitor-ada" width="60">
+    </div>
+    <div>
+    Monitor's Name<br/>
+    <input type="text" id="monitor-who" width="60">
+    </div>
+    <div>
+    Issues/Notes:<br/>
+    <textarea id="monitor-notes" cols="35" rows="10"></textarea>
+    </div>
+    <input type="hidden" id="monitor-id">
+</div>
+
+
+<!-- ----------------------- Help ------------------------------- -->
+
+<div id="help-step0" title="Getting Started" class="help-dialog">
+    <p>Welcome to the Holistic Planning Application.</p>
+    <p>To get started, you need to define your ranch's paddocks. This is done on the "Paddocks" tab. This needs to be done once initially and anytime you decide to change the layout of paddocks on the ranch. Once that it complete, you need to create a Plan, use the [New Plan] button above, or select an existing plan from the drop down menu. When you start the application it will automatically select the last plan created.</p>
+    <p>Now that you have a plan to work with, you can follow the planning process by using the tabs on the left of the "Planning" tab. The process follows the order of the tabs from top to bottom. You can revisit any tab as needed to review or change your inputs. Click the "Completed" checkbox to indicate that you have competed that tab. This is just a simple bookkeeping feature so you can easily remember what still needs to be worked out. You can still go back to a "completed" tab as needed and make changes or toggle the checkbox on/off.</p>
+    <p>Next Steps: Simple go to the next tab "Identify Planning Factors" and work your way down the planning list. Each tab has a context specific [Help] button to discuss issues and concerns related to that planning step.</p>
+</div>
+
+<div id="help-step1" title="Identify Planning Factors" class="help-dialog">
+    <p>Create a Plan on the "Planning" tab for this year and enter your list of factors so they will be handy for future reference.</p>
+    <p> When this section is completed, click the [Completed] button on the page and to mark it as completed. You can always come back and update your list of factors as new ideas come into play.</p>
+</div>
+
+<div id="help-step2" title="Management Concerns" class="help-dialog">
+    <p>Most of your work for this step in the planning process will be done on the calendar tab where you need to enter events.</p>
+    <p>If this is a closed plan mark the start and the end of the growing season on your calendar.</p>
+    <p>If you think of other factors you want to remember to take into account will planning add them to the factor list.</p>
+</div>
+
+<div id="help-step3" title="Select Paddocks and Exclusions" class="help-dialog">
+
+    <p>When selecting paddocks be careful not to select paddocks the are already in use in another plan if you have more than one plan active, but this will not be the case for most users.</p>
+</div>
+
+<div id="help-step4" title="Define the Herd(s)" class="help-dialog">
+    <p>A herd is defined as a group of animals that will be rotated between paddock to together regardless of the make up of animals in the <b>herd</b>.</p>
+    <p>Most smaller ranches will only have a single herd as you will need more paddocks to support multiple herds and allow for adequate recovery periods of the paddocks.</p>
+    <p>If you are new to this planning method or you have a smaller ranch, try to keep your plan simple to start with and built it based on a single herd.</p>
+</div>
+
+<div id="help-step5" title="Check Historical Grazing Patterns" class="help-dialog">
+    <p>Skip this step if this is your first grazing plan. Otherwise, check
+    paddock by paddock over previous grazing charts for evidence of
+    inappropriate heavy use of individual paddocks, repeated early or late
+    season use of particular paddocks, or of paddocks that failed to
+    receive adequate recovery time in the recent past.
+    If paddocks were marked as heavily grazed, especially early or late in
+    the season last year, exclude them in the early and late growing
+    season this year to avoid repetition.</p>
+    <p>This table counts the frequency of historical use in the given months.
+    Ideally one
+    would like to have these numbers consistent across the months in the plan
+    over the long term. In the short term avoid reuse at start or end of the
+    growing season. Also if a paddock has been used a lot in a given month
+    then avoid using that month also.</p>
+</div>
+
+<div id="help-step6" title="Rate Paddock Productivity" class="help-dialog">
+    <p>For <b>Forage Quality</b>, you should enter ADA/H for each paddock, or rate it 1-10.</p>
+    <p><b>Est. Relative Quality</b> is the estimated animals days for the paddock based on <b>Forage Quality</b> if you entered a value in ADA/H, but if you entered an rating, then the number will be a relative ranking of the amount of forage each paddock can give relative to the other paddocks.</p>
+
+</div>
+
+<div id="help-step7" title="Determine Recovery Periods" class="help-dialog">
+    <p>Enter your minimum and maximum recovery periods (in days) for each planned month. Unless you have a great many paddocks per herd and can safely choose a single recovery period, you will have to determine the expected plant recovery period under fast growth conditions and the expected plant recovery period under slow growth conditions.</p>
+
+</div>
+
+<div id="help-step8" title="Check Grazing Periods" class="help-dialog">
+
+</div>
+
+<div id="help-step9" title="Plot Grazings on Calendar" class="help-dialog">
+    <p>You can reorder the paddocks by grabbing the <img src="updown2.gif"> on
+    the left side of the table when the mouse is over a row. The calendar has
+    the various planning events shown on it. The green is where that paddock
+    will get grazed.if the whole row is red you are trying to graze the paddock
+    where you have an exclusion. Move it up/down to avoid the exclusion.</p>
+    <p>You should also look back at the <b>Check Historical Grazing Patterns</b>
+    tab to avoid bad patterns like repeatitive grazing of the the same paddock
+    at the start or end of a season or is getting more heavily used than others.
+</div>
+
+<div id="help-step10" title="Implement the Plan" class="help-dialog">
+    <h3>Recheck your plan</h3>
+    <p>Review your plan regularly, print out reports, check that the plan is on track and make adjustments as needed.</p>
+    <h3>Monitor Your Paddocks</h3>
+    <p>Monitor the growth and recovery of your paddocks. Also assess the quality of the paddock you are moving the herd to and record it as a monitor event here.</p>
+    <h3>Record the Actual Moves</h3>
+    <p>When you make an actual move assess the residual feed left on the
+    paddock and enter it into the actual move by clicking on the move event
+    in the calendar. Note what kind of growth rate you had while occupying
+    the paddock. If there was a serious error made in the paddock you are
+    leaving check the box and add a description performance area.</p>
+    <p>Check the condition of the paddock that you are moving the herd into
+    and add a monitor event using the button above.</p>
+    <h3>How to Replan if Needed</h3>
+    <p>You can make changes to your plan at any time. Actual events obviously
+    can not be changed, but you can replan future events. There are two
+    approaches to replanning. 1) is to just update the current plan for minor
+    changes, 2) another is to create a new plan, for major changes, based on
+    the remaining days and abandon the old plan for now. The advantage to
+    making a new plan is that you can keep the original plan around for
+    archival purposes and look at it in the future to re-assess assumptions
+    or conditions that changed and forced the replan. On the new plan, you
+    might need to sell stock to reduce the requirements for intake if you are
+    in a drought or had a fire that burnt through some padocks or add more
+    paddocks that you had not planned to use in the original plan. If you only
+    need to make minor changes then use your existing plan, otherwise start a
+    new plan.</p>
+</div>
+
+</body>
+</html>
+
