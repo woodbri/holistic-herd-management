@@ -1,0 +1,26 @@
+version: '3.4'
+services:
+  app:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.app
+    ports:
+      - 8080:80
+    volumes:
+      - ./holistic-database.php:/var/www/html/holistic-database.php
+      - ./holistic-config.php:/var/www/html/holistic-config.php
+      - ./config.php:/var/www/html/class/config.php
+
+  pgsql:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile.db
+    environment:
+      POSTGRES_PASSWORD: VERYSECRET
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # To use sample data
+      - ../sample-database-dump.sql:/docker-entrypoint-initdb.d/schema.sql
+
+volumes:
+  pgdata:

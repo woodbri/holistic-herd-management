@@ -1,0 +1,2 @@
+FROM mdillon/postgis:11-alpine
+COPY ./database-schema.sql /docker-entrypoint-initdb.d/schema.sql
