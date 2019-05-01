@@ -12,10 +12,10 @@ SET client_min_messages = warning;
 -- Name: data; Type: SCHEMA; Schema: -; Owner: -
 --
 
-CREATE SCHEMA data;
+-- CREATE SCHEMA data;
 
 
-SET search_path = data, pg_catalog;
+-- SET search_path = data, pg_catalog;
 
 --
 -- Name: actgrazingdays(integer); Type: FUNCTION; Schema: data; Owner: -

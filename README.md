@@ -39,6 +39,14 @@ psql -U postgres -h localhost holistic_herd -f sample-database-dump.sql
 
 * Browse to the index.html file on your web server.
 
+## Testing with docker-compose
+
+This assumes you have docker and docker-compose installed.
+
+Open a command line in the `docker` directory, run `docker-compose up`.
+
+Once the database has loaded the schema, you can try out the manager on `http://localhost:8080` in your browser.
+
 ## Acknowledgments
 
 * Thanks to Frank Aragona for his patience and knowledge on holistic herd management.
