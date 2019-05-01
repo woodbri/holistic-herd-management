@@ -3,6 +3,18 @@
 Web-based client and PostgreSQL server for managing herd rotations on a ranch
 following holistic guidelines.
 
+## Deprecated
+
+While this project works as is, it has been deprecated and the technology has
+been reintegrated into Durpal project FarmOS as the Grazing Module and all
+future development will be done there.
+
+https://farmos.org/
+https://github.com/farmOS/farm_grazing
+
+This provides user management, detailed records keeping, and integration
+with other FarmOS modules.
+
 ## Included Software
 
 This repository contains snapshots of
